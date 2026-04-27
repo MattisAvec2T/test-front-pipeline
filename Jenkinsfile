@@ -6,7 +6,6 @@ pipeline {
         IMAGE_NAME     = 'frontend-node'
         CONTAINER_NAME = 'frontend-node'
         PORT           = '8081'
-        NODE_IMAGE     = 'node:22.13.1-alpine3.21'
     }
 
     stages {
@@ -19,14 +18,14 @@ pipeline {
 
         stage('Install') {
             steps {
-                sh 'docker run --rm -v $(pwd):/app -w /app ${NODE_IMAGE} npm install'
+                sh 'npm install'
             }
         }
 
         stage('Test') {
             // Remplacer le script "test" dans package.json par de vrais tests (ex: vitest)
             steps {
-                sh 'docker run --rm -v $(pwd):/app -w /app ${NODE_IMAGE} npm test'
+                sh 'npm test'
             }
         }
 

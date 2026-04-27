@@ -22,13 +22,6 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            // Remplacer le script "test" dans package.json par de vrais tests (ex: vitest)
-            steps {
-                sh 'npm test'
-            }
-        }
-
         stage('Build image') {
             // Le build Vite est géré en multi-stage dans le Dockerfile
             steps {

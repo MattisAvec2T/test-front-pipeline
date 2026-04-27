@@ -6,6 +6,7 @@ pipeline {
         IMAGE_NAME     = 'frontend-node'
         CONTAINER_NAME = 'frontend-node'
         PORT           = '8081'
+        NODE_IMAGE     = 'node:22.13.1-alpine3.21'
     }
 
     stages {
@@ -17,29 +18,15 @@ pipeline {
         }
 
         stage('Install') {
-            agent {
-                docker {
-                    image 'node:22.13.1-alpine3.21'
-                    label 'docker-agent'
-                    reuseNode true
-                }
-            }
             steps {
-                sh 'npm install'
+                sh 'docker run --rm -v $(pwd):/app -w /app ${NODE_IMAGE} npm install'
             }
         }
 
         stage('Test') {
             // Remplacer le script "test" dans package.json par de vrais tests (ex: vitest)
-            agent {
-                docker {
-                    image 'node:22.13.1-alpine3.21'
-                    label 'docker-agent'
-                    reuseNode true
-                }
-            }
             steps {
-                sh 'npm test'
+                sh 'docker run --rm -v $(pwd):/app -w /app ${NODE_IMAGE} npm test'
             }
         }
 

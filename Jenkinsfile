@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         REPOSITORY     = 'https://github.com/MattisAvec2T/test-front-pipeline.git'
-        IMAGE_NAME     = 'frontend-node'
-        CONTAINER_NAME = 'frontend-node'
+        IMAGE_NAME     = 'test-pipeline-front'
+        CONTAINER_NAME = 'test-pipeline-front'
         PORT           = '8081'
     }
 
@@ -25,6 +25,25 @@ pipeline {
         stage('Build image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} -t ${IMAGE_NAME}:latest ."
+            }
+        }
+
+        stage('Push on DockerHub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    sh """
+                        echo "\$DOCKERHUB_TOKEN" | docker login -u "\$DOCKERHUB_USER" --password-stdin
+                        docker tag ${IMAGE_NAME}:${BUILD_NUMBER} \$DOCKERHUB_USER/${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker tag ${IMAGE_NAME}:latest \$DOCKERHUB_USER/${IMAGE_NAME}:latest
+                        docker push \$DOCKERHUB_USER/${IMAGE_NAME}:${BUILD_NUMBER}
+                        docker push \$DOCKERHUB_USER/${IMAGE_NAME}:latest
+                        docker logout
+                    """
+                }
             }
         }
 

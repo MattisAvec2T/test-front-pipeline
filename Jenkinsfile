@@ -17,6 +17,13 @@ pipeline {
         }
 
         stage('Install') {
+            agent {
+                docker {
+                    image 'node:22.13.1-alpine3.21'
+                    label 'docker-agent'
+                    reuseNode true
+                }
+            }
             steps {
                 sh 'npm install'
             }
@@ -24,6 +31,13 @@ pipeline {
 
         stage('Test') {
             // Remplacer le script "test" dans package.json par de vrais tests (ex: vitest)
+            agent {
+                docker {
+                    image 'node:22.13.1-alpine3.21'
+                    label 'docker-agent'
+                    reuseNode true
+                }
+            }
             steps {
                 sh 'npm test'
             }

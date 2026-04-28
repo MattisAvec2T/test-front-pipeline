@@ -1,12 +1,15 @@
 pipeline {
     agent { label 'docker-agent' }
 
+    parameters {
+        string(name: 'VM_IP',   defaultValue: '192.168.139.243', description: 'Adresse IP de la VM frontend')
+        string(name: 'VM_USER', defaultValue: 'ubuntu',          description: 'Utilisateur SSH')
+        string(name: 'PORT',    defaultValue: '80',              description: 'Port exposé sur la VM')
+    }
+
     environment {
         IMAGE_NAME     = 'test-pipeline-front'
         CONTAINER_NAME = 'test-pipeline-front'
-        PORT           = '80'
-        VM_USER        = 'ubuntu'
-        VM_IP          = '192.168.139.243'
     }
 
     stages {
@@ -19,7 +22,7 @@ pipeline {
                     passwordVariable: 'DOCKERHUB_TOKEN'
                 )]) {
                     sshagent(['vm-ssh-key-front']) {
-                        sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} 'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; docker rm -f ${CONTAINER_NAME} || true; docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'"
+                        sh "ssh -o StrictHostKeyChecking=no ${params.VM_USER}@${params.VM_IP} 'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; docker rm -f ${CONTAINER_NAME} || true; docker run -d --name ${CONTAINER_NAME} -p ${params.PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'"
                     }
                 }
             }
@@ -29,7 +32,7 @@ pipeline {
 
     post {
         success {
-            echo "Frontend déployé sur ${VM_IP}:${PORT}"
+            echo "Frontend déployé sur ${params.VM_IP}:${params.PORT}"
         }
         failure {
             echo 'Le déploiement a échoué — vérifier les logs ci-dessus.'

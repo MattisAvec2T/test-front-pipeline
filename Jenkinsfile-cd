@@ -4,7 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME     = 'test-pipeline-front'
         CONTAINER_NAME = 'test-pipeline-front'
-        DOCKERHUB_USER = 'mattisavec2t'
         PORT           = '8081'
         VM_USER        = 'ubuntu'
         VM_IP          = '0.0.0.0'
@@ -14,13 +13,19 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sshagent(['vm-ssh-key']) {
-                    sh """
-                        ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} \
-                            'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; \
-                             docker rm -f ${CONTAINER_NAME} || true; \
-                             docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'
-                    """
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKERHUB_USER',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    sshagent(['vm-ssh-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} \
+                                'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; \
+                                 docker rm -f ${CONTAINER_NAME} || true; \
+                                 docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'
+                        """
+                    }
                 }
             }
         }

@@ -19,12 +19,7 @@ pipeline {
                     passwordVariable: 'DOCKERHUB_TOKEN'
                 )]) {
                     sshagent(['vm-ssh-key-front']) {
-                        sh """
-                            ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} \
-                                'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; \
-                                 docker rm -f ${CONTAINER_NAME} || true; \
-                                 docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'
-                        """
+                        sh "ssh -o StrictHostKeyChecking=no ${VM_USER}@${VM_IP} 'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; docker rm -f ${CONTAINER_NAME} || true; docker run -d --name ${CONTAINER_NAME} -p ${PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'"
                     }
                 }
             }

@@ -2,9 +2,10 @@ pipeline {
     agent { label 'docker-agent' }
 
     parameters {
-        string(name: 'VM_IP',   defaultValue: '0.0.0.0', description: 'Adresse IP de la VM frontend')
-        string(name: 'VM_USER', defaultValue: 'ubuntu',          description: 'Utilisateur SSH')
-        string(name: 'PORT',    defaultValue: '80',              description: 'Port exposé sur la VM')
+        string(name: 'VM_IP',      defaultValue: '0.0.0.0', description: 'Adresse IP de la VM frontend')
+        string(name: 'VM_USER',    defaultValue: 'ubuntu',  description: 'Utilisateur SSH')
+        string(name: 'PORT',       defaultValue: '80',      description: 'Port exposé sur la VM')
+        string(name: 'IMAGE_TAG',  defaultValue: 'latest',  description: 'Tag de l\'image à déployer — "latest" correspond à la version la plus récente, indiquer un numéro de build pour rollback (ex. 7)')
     }
 
     environment {
@@ -22,7 +23,7 @@ pipeline {
                     passwordVariable: 'DOCKERHUB_TOKEN'
                 )]) {
                     sshagent(['vm-ssh-key-front']) {
-                        sh "ssh -o StrictHostKeyChecking=no ${params.VM_USER}@${params.VM_IP} 'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:latest; docker rm -f ${CONTAINER_NAME} || true; docker run -d --name ${CONTAINER_NAME} -p ${params.PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:latest'"
+                        sh "ssh -o StrictHostKeyChecking=no ${params.VM_USER}@${params.VM_IP} 'docker pull ${DOCKERHUB_USER}/${IMAGE_NAME}:${params.IMAGE_TAG}; docker rm -f ${CONTAINER_NAME} || true; docker run -d --name ${CONTAINER_NAME} -p ${params.PORT}:80 ${DOCKERHUB_USER}/${IMAGE_NAME}:${params.IMAGE_TAG}'"
                     }
                 }
             }
@@ -32,7 +33,7 @@ pipeline {
 
     post {
         success {
-            echo "Frontend déployé sur ${params.VM_IP}:${params.PORT}"
+            echo "Frontend déployé sur ${params.VM_IP}:${params.PORT} (tag: ${params.IMAGE_TAG})"
         }
         failure {
             echo 'Le déploiement a échoué — vérifier les logs ci-dessus.'

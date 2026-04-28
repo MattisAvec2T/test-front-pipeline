@@ -2,9 +2,7 @@ pipeline {
     agent { label 'docker-agent' }
 
     environment {
-        IMAGE_NAME     = 'test-pipeline-front'
-        CONTAINER_NAME = 'test-pipeline-front'
-        PORT           = '8081'
+        IMAGE_NAME = 'test-pipeline-front'
     }
 
     stages {
@@ -14,6 +12,12 @@ pipeline {
                 sh 'npm install'
             }
         }
+
+        // stage('Tests') {
+        //     steps {
+        //         sh 'npm test'
+        //     }
+        // }
 
         stage('SonarQube Analysis') {
             steps {
@@ -56,21 +60,14 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            steps {
-                sh "docker rm -f ${CONTAINER_NAME} || true"
-                sh "docker run -d --name ${CONTAINER_NAME} --network devops -p ${PORT}:80 ${IMAGE_NAME}:latest"
-            }
-        }
-
     }
 
     post {
         success {
-            echo "Frontend disponible sur http://localhost:${PORT}"
+            echo "Image ${IMAGE_NAME}:latest publiée sur Docker Hub"
         }
         failure {
-            echo 'Le pipeline a échoué — vérifier les logs ci-dessus.'
+            echo 'Le pipeline CI/CD a échoué — vérifier les logs ci-dessus.'
         }
     }
 }

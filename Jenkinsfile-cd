@@ -2,7 +2,7 @@ pipeline {
     agent { label 'docker-agent' }
 
     parameters {
-        string(name: 'VM_IP',   defaultValue: '192.168.139.243', description: 'Adresse IP de la VM frontend')
+        string(name: 'VM_IP',   defaultValue: '0.0.0.0', description: 'Adresse IP de la VM frontend')
         string(name: 'VM_USER', defaultValue: 'ubuntu',          description: 'Utilisateur SSH')
         string(name: 'PORT',    defaultValue: '80',              description: 'Port exposé sur la VM')
     }

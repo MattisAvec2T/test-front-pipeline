@@ -2,19 +2,12 @@ pipeline {
     agent { label 'docker-agent' }
 
     environment {
-        REPOSITORY     = 'https://github.com/MattisAvec2T/test-front-pipeline.git'
         IMAGE_NAME     = 'test-pipeline-front'
         CONTAINER_NAME = 'test-pipeline-front'
         PORT           = '8081'
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: "${REPOSITORY}"
-            }
-        }
 
         stage('Install') {
             steps {

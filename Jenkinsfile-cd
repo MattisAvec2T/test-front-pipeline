@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME     = 'test-pipeline-front'
         CONTAINER_NAME = 'test-pipeline-front'
-        PORT           = '8081'
+        PORT           = '80'
         VM_USER        = 'ubuntu'
         VM_IP          = '0.0.0.0'
     }

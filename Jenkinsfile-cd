@@ -6,7 +6,7 @@ pipeline {
         CONTAINER_NAME = 'test-pipeline-front'
         PORT           = '80'
         VM_USER        = 'ubuntu'
-        VM_IP          = '0.0.0.0'
+        VM_IP          = '192.168.139.243'
     }
 
     stages {
